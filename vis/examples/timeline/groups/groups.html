@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Timeline | Group example</title>
+
+  <style>
+    body, html {
+      font-family: arial, sans-serif;
+      font-size: 11pt;
+    }
+    /* override color in vis.css */
+    
+    .vis-item {
+      border-color: black !important;
+    }
+    .vis-item .vis-item-content {
+      border-radius: 1px;
+    }
+
+    
+    #visualization {
+      box-sizing: border-box;
+      width: 100%;
+      height: 300px;
+    }
+
+    .ref1 {
+      color: white;
+      background-color: rgba(8, 125, 201, 0.59) !important;
+    }
+  
+    .ref2 {
+      color: white;
+      background-color: rgba(255, 131, 0, 0.73) !important;
+    }
+    .candidate {
+      color: white;
+      background-color: rgba(107, 90, 179, 0.47) !important;
+    }
+  </style>
+
+  <!-- note: moment.js must be loaded before vis.js, else vis.js uses its embedded version of moment.js -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+
+  <script src="../../../dist/vis.js"></script>
+  <link href="../../../dist/vis.css" rel="stylesheet" type="text/css" />
+  <script src="../../googleAnalytics.js"></script>
+</head>
+<body>
+  <p>candidate use color: <span class='candidate'>xxx<span></p>
+  <p>ref 1 use color: <span class='ref1'>xxx<span></p>
+  <p>ref 2 use color: <span class='ref2'>xxx<span></p>
+<div id="visualization"></div>
+
+<script>
+  // xref id = 2956
+  var ref1 = [
+    {'action': 'access', 'when': '2013-05-01 04:43:57'},
+    {'action': 'access', 'when': '2013-05-01 04:44:02'},
+    {'action': 'agree',  'when': '2013-05-01 04:44:29'},
+    {'action': 'verify', 'when': '2013-05-01 04:49:34'},
+    {'action': 'verify', 'when': '2013-05-01 04:49:43'},
+    {'action': 'submit', 'when': '2013-05-01 05:36:23'}
+  ]
+
+  var ref2 = [
+    {'action': 'access', 'when': '2013-05-01 05:04:54'},
+    {'action': 'access', 'when': '2013-05-01 05:04:55'},
+    {'action': 'agree',  'when': '2013-05-01 05:05:04'},
+    {'action': 'agree',  'when': '2013-05-01 05:05:05'},
+    {'action': 'verify', 'when': '2013-05-01 05:05:27'},
+    {'action': 'submit', 'when': '2013-05-01 05:32:03'}
+  ]
+
+  var candidate = [
+    {'action': 'access', 'when': '2013-05-01 04:06:02'},
+    {'action': 'access', 'when': '2013-05-01 04:06:12'},
+    {'action': 'agree',  'when': '2013-05-01 04:06:28'},
+    {'action': 'verify', 'when': '2013-05-01 04:06:57'},  
+    {'action': 'submit', 'when': '2013-05-01 04:37:03'}
+  ]
+
+  var no_people = 3;
+
+  // label and data mapping
+  var names = {
+    'ref1': ref1, 
+    'ref2': ref2,
+    'candidate': candidate
+  };
+
+  // populate group label array 
+  var groups = new vis.DataSet();
+  for (var l = 0; l < names.length; l++) {
+    groups.add({
+      id: l,
+      content: names[g]
+    });
+  }
+
+  var itemCounter = -1;
+  var groupCounter = -1;
+  // data set to be visualized
+  var items = new vis.DataSet();
+  for (var k in names) {
+    data_arr = names[k]
+    groupCounter += 1
+
+    for (var i = 0; i < data_arr.length; i++) {
+      item = data_arr[i]
+      itemCounter += 1
+      
+      console.log('ic:' + itemCounter + " : gc: " + groupCounter)
+      console.log(item['action'])
+
+      items.add({
+        id:       itemCounter,
+        group:    groupCounter,
+        content:  '<span>' + item['action'] + '</span>',
+        className: k,
+        start:    moment(item['when'])
+      });
+    };
+  };
+
+
+  // create visualization
+  var container = document.getElementById('visualization');
+  var options = {
+    groupOrder: 'content'  // groupOrder can be a property name or a sorting function
+  };
+
+  var timeline = new vis.Timeline(container);
+  timeline.setOptions(options);
+  // dump into groups
+  // timeline.setGroups(groups);
+  timeline.setItems(items);
+
+</script>
+</body>
+</html>
